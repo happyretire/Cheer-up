@@ -4,32 +4,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cheer-up | 전광판 메신저</title>
+    <meta name="description" content="세련된 감성의 웹 전광판 메시저입니다. 수험생 응원, 행사 공지 등 다양한 공간에서 힙하게 사용하세요.">
+    <meta name="author" content="ⓒ Dunam">
+    <title>Cheer-up | 프리미엄 전광판 </title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Gowun+Dodum:wght@400;700&family=Outfit:wght@700&family=Noto+Sans+KR:wght@700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Gowun+Dodum:wght@400;700&family=Outfit:wght@500;700&family=Noto+Sans+KR:wght@700&display=swap"
         rel="stylesheet">
     <style>
         :root {
-            --primary-color: #00f2fe;
-            --secondary-color: #4facfe;
-            --bg-dark: #0a0a0c;
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
+            --primary: #00f2fe;
+            --secondary: #4facfe;
+            --accent: #f093fb;
+            --bg-dark: #07080a;
+            --glass: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-dim: #a0a0a0;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
         }
 
         body {
             background-color: var(--bg-dark);
-            color: white;
+            color: var(--text-main);
             font-family: 'Outfit', 'Noto Sans KR', sans-serif;
             height: 100vh;
+            width: 100vw;
             overflow: hidden;
             display: flex;
             flex-direction: column;
@@ -38,295 +46,458 @@
         }
 
         /* 동적 오로라 배경 */
-        .bg-gradient {
+        .bg-layer {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--bg-dark);
+            inset: 0;
             z-index: -1;
             overflow: hidden;
+            background: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #07080a 100%);
         }
 
-        .bg-gradient::before,
-        .bg-gradient::after {
-            content: "";
+        .aurora {
             position: absolute;
-            width: 150vw;
-            height: 150vh;
-            top: -25vh;
-            left: -25vw;
-            z-index: -1;
-            background: radial-gradient(circle at center,
-                    rgba(0, 242, 254, 0.15) 0%,
-                    rgba(79, 172, 254, 0.1) 30%,
-                    transparent 70%);
-            animation: aurora 20s linear infinite;
+            width: 150%;
+            height: 150%;
+            top: -25%;
+            left: -25%;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(0, 242, 254, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(79, 172, 254, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(240, 147, 251, 0.05) 0%, transparent 60%);
+            filter: blur(80px);
+            animation: aurora-move 25s infinite alternate ease-in-out;
         }
 
-        .bg-gradient::after {
-            background: radial-gradient(circle at center,
-                    rgba(255, 0, 255, 0.1) 0%,
-                    rgba(161, 196, 253, 0.05) 40%,
-                    transparent 70%);
-            animation: aurora 15s linear infinite reverse;
-            animation-delay: -5s;
-        }
-
-        @keyframes aurora {
+        @keyframes aurora-move {
             0% {
-                transform: rotate(0deg) scale(1);
+                transform: scale(1) translate(0, 0) rotate(0deg);
             }
 
             50% {
-                transform: rotate(180deg) scale(1.2);
+                transform: scale(1.1) translate(5%, 5%) rotate(5deg);
             }
 
             100% {
-                transform: rotate(360deg) scale(1);
+                transform: scale(1) translate(-2%, 8%) rotate(-3deg);
             }
         }
 
-        /* 가로 전광판 컨테이너 */
-        .marquee-container {
+        /* 전광판 구역 */
+        .display-area {
             width: 100%;
-            height: 60vh;
-            overflow: hidden;
+            height: 100%;
             display: flex;
             align-items: center;
             position: relative;
+            cursor: none;
         }
 
-        @keyframes rainbow {
+        .marquee-wrap {
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        #marquee {
+            display: inline-block;
+            font-size: 35vh;
+            font-weight: 700;
+            font-family: 'Gowun Dodum', 'Noto Sans KR', sans-serif;
+            will-change: transform;
+            line-height: 1;
+            padding: 20px 0;
+            transition: font-size 0.3s ease;
+        }
+
+        /* 테마별 텍스트 스타일 */
+        .theme-rainbow {
+            background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff);
+            background-size: 300% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient-flow 10s linear infinite;
+        }
+
+        .theme-cyber {
+            color: #00f2fe;
+            text-shadow: 0 0 20px rgba(0, 242, 254, 0.8), 0 0 40px rgba(0, 242, 254, 0.4);
+        }
+
+        .theme-fire {
+            background: linear-gradient(to top, #ff416c, #ff4b2b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 15px rgba(255, 65, 108, 0.5));
+        }
+
+        .theme-gold {
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 5px rgba(253, 160, 133, 0.3));
+        }
+
+        @keyframes gradient-flow {
             0% {
-                filter: hue-rotate(0deg);
+                background-position: 0% 50%;
             }
 
             100% {
-                filter: hue-rotate(360deg);
+                background-position: 300% 50%;
             }
         }
 
-        .marquee-text {
-            white-space: nowrap;
-            font-size: 32vh;
-            font-weight: 700;
-            font-family: 'Gowun Dodum', sans-serif;
-            position: absolute;
-            will-change: transform;
-            /* 세련된 그라데이션 - 약간 더 부드럽게 */
-            background: linear-gradient(to right, #00f2fe, #a1c4fd, #c2e9fb);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: rainbow 8s linear infinite;
-            /* 조금 더 천천히 변하게 하여 감성 부여 */
-            /* 은은한 그림자로 고급스러움 강조 */
-            text-shadow: 2px 2px 20px rgba(255, 255, 255, 0.1),
-                4px 4px 15px rgba(0, 0, 0, 0.3);
-            letter-spacing: 1px;
-        }
-
-        /* 컨트롤 패널 */
-        .control-panel {
+        /* 컨트롤 패널 리뉴얼 */
+        .controls {
             position: fixed;
-            bottom: 40px;
-            padding: 24px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 600px;
+            background: var(--glass);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
             border: 1px solid var(--glass-border);
-            border-radius: 20px;
+            border-radius: 24px;
+            padding: 24px;
             display: flex;
             flex-direction: column;
-            /* 세로 로직으로 변경 */
-            gap: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            transition: all 0.3s ease;
-            z-index: 100;
-            width: fit-content;
-            max-width: 90vw;
+            gap: 20px;
+            z-index: 1000;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+            transition: var(--transition);
         }
 
-        .input-group {
+        .controls.hidden {
+            transform: translate(-50%, 150%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .row {
             display: flex;
             gap: 12px;
+            align-items: center;
         }
 
-        .recommend-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
+        .flex-1 {
+            flex: 1;
         }
 
-        .tag-btn {
-            background: rgba(255, 255, 255, 0.1);
+        input[type="text"] {
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--glass-border);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            color: #ddd;
-            transition: all 0.2s;
-        }
-
-        .tag-btn:hover {
-            background: var(--secondary-color);
-            color: white;
-        }
-
-        .control-panel:hover {
-            border-color: var(--secondary-color);
-            transform: translateY(-5px);
-        }
-
-        input {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--glass-border);
-            padding: 12px 20px;
             border-radius: 12px;
+            padding: 12px 16px;
             color: white;
-            font-size: 1.1rem;
-            width: 300px;
+            font-size: 1rem;
             outline: none;
-            transition: border-color 0.3s;
+            width: 100%;
+            transition: var(--transition);
         }
 
-        input:focus {
-            border-color: var(--primary-color);
+        input[type="text"]:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary);
+        }
+
+        .setting-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .setting-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
         }
 
         button {
-            padding: 12px 24px;
+            padding: 10px 20px;
             border-radius: 12px;
             border: none;
-            background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
-            color: white;
+            background: var(--primary);
+            color: #000;
             font-weight: 700;
             cursor: pointer;
-            transition: transform 0.2s, opacity 0.2s;
+            transition: var(--transition);
+            white-space: nowrap;
         }
 
         button:hover {
-            transform: scale(1.05);
-            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 242, 254, 0.4);
         }
 
-        button:active {
-            transform: scale(0.95);
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
         }
 
-        /* 토글 버튼 */
-        .toggle-btn {
+        .theme-selector {
+            display: flex;
+            gap: 8px;
+        }
+
+        .theme-dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: var(--transition);
+        }
+
+        .theme-dot.active {
+            border-color: white;
+            transform: scale(1.2);
+        }
+
+        /* 토글 스위치 ⚙️ */
+        .toggle-ui {
             position: fixed;
             top: 20px;
             right: 20px;
-            background: var(--glass-bg);
+            width: 44px;
+            height: 44px;
+            background: var(--glass);
             border: 1px solid var(--glass-border);
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            z-index: 101;
+            z-index: 1001;
+            transition: var(--transition);
+            font-size: 1.2rem;
+            color: var(--text-main);
         }
 
-        .hidden {
-            display: none !important;
+        .toggle-ui:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(45deg);
+        }
+
+        /* 태그 리스트 */
+        .tag-list {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: none;
+        }
+
+        .tag-list::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tag {
+            font-size: 0.8rem;
+            padding: 4px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            cursor: pointer;
+            color: var(--text-dim);
+            transition: var(--transition);
+        }
+
+        .tag:hover {
+            background: var(--primary);
+            color: black;
+            border-color: var(--primary);
+        }
+
+        /* 반응형 스타일 */
+        @media (max-width: 600px) {
+            #marquee {
+                font-size: 20vh;
+            }
+
+            .controls {
+                padding: 16px;
+            }
+
+            .row {
+                flex-wrap: wrap;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div class="bg-gradient"></div>
-
-    <div class="marquee-container">
-        <div id="marquee" class="marquee-text">내신 1등급 가즈아 🔥</div>
+    <div class="bg-layer">
+        <div class="aurora"></div>
     </div>
 
-    <div class="control-panel" id="controlPanel">
-        <div class="input-group">
+    <div class="display-area" onclick="toggleControls()">
+        <div class="marquee-wrap">
+            <div id="marquee" class="theme-rainbow">가즈아 🔥</div>
+        </div>
+    </div>
+
+    <div class="controls" id="controls">
+        <div class="row">
             <input type="text" id="textInput" placeholder="응원 메시지를 입력하세요" value="가즈아아아아아아 🔥">
             <button onclick="updateText()">적용</button>
-            <button id="pauseBtn" onclick="togglePause()">STOP</button>
+            <button class="btn-secondary" id="playPauseBtn" onclick="togglePause()">STOP</button>
         </div>
-        <div class="recommend-tags">
-            <span style="font-size: 0.8rem; color: #888; width: 100%;">추천:</span>
-            <button class="tag-btn" onclick="setQuickText('1등급 가즈아! 🔥')">#수험</button>
-            <button class="tag-btn" onclick="setQuickText('너의 시작을 응원해 ✨')">#입학</button>
-            <button class="tag-btn" onclick="setQuickText('우리 반 장기자랑 기강 잡자 💃')">#축제</button>
-            <button class="tag-btn" onclick="setQuickText('졸업 축하해! 앞길 탄탄대로 🎓')">#졸업</button>
-            <button class="tag-btn" onclick="setQuickText('급식 메뉴 실화냐? 🍱')">#급식</button>
+
+        <div class="row">
+            <div class="setting-item">
+                <span class="setting-label">SPEED</span>
+                <input type="range" id="speedInput" min="1" max="20" value="8">
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">SIZE</span>
+                <input type="range" id="sizeInput" min="10" max="60" value="35">
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">THEME</span>
+                <div class="theme-selector">
+                    <div class="theme-dot active" style="background: linear-gradient(45deg, #f00, #00f);"
+                        onclick="setTheme('theme-rainbow', this)"></div>
+                    <div class="theme-dot" style="background: #00f2fe;" onclick="setTheme('theme-cyber', this)"></div>
+                    <div class="theme-dot" style="background: #ff4b2b;" onclick="setTheme('theme-fire', this)"></div>
+                    <div class="theme-dot" style="background: #f6d365;" onclick="setTheme('theme-gold', this)"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tag-list">
+            <div class="tag" onclick="quickSet('1등급 가즈아! 🔥')">#수험</div>
+            <div class="tag" onclick="quickSet('너의 시작을 응원해 ✨')">#응원</div>
+            <div class="tag" onclick="quickSet('졸업 축하해! 앞길 탄탄대로 🎓')">#졸업</div>
+            <div class="tag" onclick="quickSet('우리 반 기강 잡으러 왔다 💃')">#축제</div>
+            <div class="tag" onclick="quickSet('오늘 점심 뭐냐? 🍱')">#급식</div>
+            <div class="tag" onclick="quickSet('사랑해 고마워 행복하자 ❤️')">#감사</div>
         </div>
     </div>
 
-    <button class="toggle-btn" onclick="toggleControls()">⚙️</button>
+    <div class="toggle-ui" onclick="toggleControls()">⚙️</div>
 
     <script>
         const marquee = document.getElementById('marquee');
-        const input = document.getElementById('textInput');
-        const controlPanel = document.getElementById('controlPanel');
-        const pauseBtn = document.getElementById('pauseBtn');
+        const textInput = document.getElementById('textInput');
+        const speedInput = document.getElementById('speedInput');
+        const sizeInput = document.getElementById('sizeInput');
+        const controls = document.getElementById('controls');
+        const btnPlayPause = document.getElementById('playPauseBtn');
 
-        let position = window.innerWidth;
-        let speed = 4;
-        let animationId;
-        let isPaused = false;
+        let state = {
+            text: "가즈아아아아아아 🔥",
+            speed: 8,
+            size: 35,
+            isPaused: false,
+            position: window.innerWidth,
+            theme: 'theme-rainbow'
+        };
+
+        function init() {
+            // 초기 위치 설정
+            state.position = window.innerWidth;
+            updateDisplay();
+            requestAnimationFrame(animate);
+
+            // 이벤트 리스너
+            speedInput.oninput = (e) => state.speed = parseInt(e.target.value);
+            sizeInput.oninput = (e) => {
+                state.size = parseInt(e.target.value);
+                marquee.style.fontSize = state.size + 'vh';
+            };
+
+            textInput.onkeypress = (e) => {
+                if (e.key === 'Enter') updateText();
+            };
+
+            window.onresize = () => {
+                state.position = window.innerWidth;
+            };
+        }
 
         function animate() {
-            if (!isPaused) {
-                position -= speed;
+            if (!state.isPaused) {
+                state.position -= state.speed;
 
                 const textWidth = marquee.offsetWidth;
-                const containerWidth = window.innerWidth;
-
-                if (position < -textWidth) {
-                    position = containerWidth;
+                if (state.position < -textWidth) {
+                    state.position = window.innerWidth;
                 }
 
-                marquee.style.transform = `translateX(${position}px)`;
+                marquee.style.transform = `translateX(${state.position}px)`;
             }
-            animationId = requestAnimationFrame(animate);
+            requestAnimationFrame(animate);
         }
 
         function updateText() {
-            const newText = input.value.trim();
-            if (newText !== "") {
-                marquee.innerText = newText;
-                setTimeout(() => {
-                    position = window.innerWidth;
-                }, 10);
+            const val = textInput.value.trim();
+            if (val) {
+                state.text = val;
+                marquee.innerText = val;
+                // 리셋 위치
+                state.position = window.innerWidth;
             }
         }
 
-        function togglePause() {
-            isPaused = !isPaused;
-            pauseBtn.innerText = isPaused ? "PLAY" : "STOP";
-        }
-
-        function setQuickText(text) {
-            input.value = text;
+        function quickSet(txt) {
+            textInput.value = txt;
             updateText();
         }
 
-        function toggleControls() {
-            controlPanel.classList.toggle('hidden');
+        function togglePause() {
+            state.isPaused = !state.isPaused;
+            btnPlayPause.innerText = state.isPaused ? "PLAY" : "STOP";
+            btnPlayPause.classList.toggle('btn-secondary', !state.isPaused);
         }
 
-        window.onload = () => {
-            position = window.innerWidth;
-            animate();
-        };
+        function toggleControls() {
+            controls.classList.toggle('hidden');
+        }
 
-        input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                updateText();
-            }
-        });
+        function setTheme(themeName, el) {
+            marquee.className = themeName;
+            state.theme = themeName;
+
+            // UI 업데이트
+            document.querySelectorAll('.theme-dot').forEach(dot => dot.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function updateDisplay() {
+            marquee.innerText = state.text;
+            marquee.style.fontSize = state.size + 'vh';
+            marquee.className = state.theme;
+        }
+
+        init();
     </script>
 </body>
 
