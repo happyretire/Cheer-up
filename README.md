@@ -38,10 +38,10 @@
 
 ---
 
-## 📝 라이선스 및 저작권
-- 본 프로젝트는 누구나 자유롭게 사용할 수 있습니다.
-- Creator: **c. happyretire**
-- [행복한 은퇴 카페 (cafe.naver.com/retireclass)](https://cafe.naver.com/retireclass)
+## 📝 라이선스
+- creator: ⓒ Dunam
+- 카페: [cafe.naver.com/retireclass](https://cafe.naver.com/retireclass)
+- 본 프로그램은 자유롭게 사용 및 배포가 가능합니다.
 
 ---
 *당신의 빛나는 순간을 응원합니다! 🚀*
